@@ -21,9 +21,10 @@ def init_db():
         db.commit()
 
 
-def query_db(query, args=(), one=False):
+def query_db(query, args=(), one=False, db=None):
     """Makes querying the database a little nicer."""
-    cursor = g.db.execute(query, args)
+    db = db or g.db
+    cursor = db.execute(query, args)
     result = [dict((cursor.description[i][0], value)
                 for i, value in enumerate(row))
                 for row in cursor.fetchall()]
