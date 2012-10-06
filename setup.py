@@ -8,12 +8,9 @@ CHANGES = open(os.path.join(here, 'CHANGES.md')).read()
 
 version = '0.0'
 
-install_requires = [
-    'flask==0.9',
-    'mock',
-    'nose'
-]
+install_requires = ['flask==0.9']
 
+testing_extras = ['nose', 'mock']
 
 setup(name='chiisai',
     version=version,
@@ -27,10 +24,12 @@ setup(name='chiisai',
     author_email='mpirnat@gmail.com',
     url='http://github.com/mpirnat/chiisai',
     license='MIT',
-    packages=find_packages('src'),
-    package_dir = {'': 'src'},
+    packages=['chiisai'],
     include_package_data=True,
     zip_safe=False,
     install_requires=install_requires,
+    extras_require = {
+        'testing': testing_extras,
+    },
     entry_points={}
 )
