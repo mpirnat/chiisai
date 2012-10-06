@@ -28,6 +28,8 @@ setup(name='chiisai',
     include_package_data=True,
     zip_safe=False,
     install_requires=install_requires,
+    test_suite='nose.collector',
+    tests_require=['nose'],
     extras_require = {
         'testing': testing_extras,
     },
