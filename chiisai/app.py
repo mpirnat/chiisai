@@ -21,6 +21,15 @@ def init_db():
         db.commit()
 
 
+def query_db(query, args=(), one=False):
+    """Makes querying the database a little nicer."""
+    cursor = g.db.execute(query, args)
+    result = [dict((cursor.description[i][0], value)
+                for i, value in enumerate(row))
+                for row in cursor.fetchall()]
+    return (result[0] if result else None) if one else result
+
+
 @app.before_request
 def before_request():
     """Make sure we are connected to the database each request."""
