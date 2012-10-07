@@ -2,6 +2,7 @@ from contextlib import closing
 from flask import Flask, g, request, session, \
         abort, redirect, render_template, url_for
 
+from chiisai import forms
 from chiisai import storage
 from chiisai import shortener
 
@@ -36,20 +37,32 @@ def new_short_url_form():
 
 @app.route('/admin/new', methods=['POST'])
 def create_short_url():
+    form = forms.URLShortenerForm(request.form)
+    if not form.validate():
+        # TODO: error gracefully
+        abort(400)
 
-    url = request.form['url']
+    url = form.url.data
+    alias = form.alias.data or None
+    explicit_alias_requested = alias is not None
 
-    alias = request.form['alias'] or None
     try:
         alias = shortener.make_alias(url, alias=alias)
     except shortener.UncleanAlias:
+        # TODO: error gracefully
         abort(400)
 
     try:
         shortener.insert_url(url, alias, g.db)
     except storage.NotUnique:
-        # Alias not unique? That's okay, we're totally idempotent!
-        pass
+        # That alias is already claimed; you can't have it
+        if explicit_alias_requested:
+            # TODO: error gracefully
+            abort(403)
+
+        # Hashed to the same thing?  Be idempotent
+        else:
+            pass
 
     short_url = url_for('short_url', alias=alias, _external=True)
     return short_url
