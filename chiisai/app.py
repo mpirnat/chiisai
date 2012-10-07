@@ -1,6 +1,9 @@
 from contextlib import closing
-from flask import Flask, g
-from sqlite3 import dbapi2 as sqlite3
+from flask import Flask, g, request, session, \
+        abort, redirect, render_template, url_for
+
+from chiisai import storage
+from chiisai import shortener
 
 
 app = Flask(__name__)
@@ -8,33 +11,10 @@ app.config.from_object('chiisai.settings')
 app.config.from_envvar('CHIISAI_SETTINGS', silent=True)
 
 
-def connect_db():
-    """Returns a new connection to the database."""
-    return sqlite3.connect(app.config['DATABASE'])
-
-
-def init_db():
-    """Creates the database tables."""
-    with closing(connect_db()) as db:
-        with app.open_resource('schema.sql') as f:
-            db.cursor().executescript(f.read())
-        db.commit()
-
-
-def query_db(query, args=(), one=False, db=None):
-    """Makes querying the database a little nicer."""
-    db = db or g.db
-    cursor = db.execute(query, args)
-    result = [dict((cursor.description[i][0], value)
-                for i, value in enumerate(row))
-                for row in cursor.fetchall()]
-    return (result[0] if result else None) if one else result
-
-
 @app.before_request
 def before_request():
     """Make sure we are connected to the database each request."""
-    g.db = connect_db()
+    g.db = storage.connect_db(app)
 
 
 @app.teardown_request
@@ -47,6 +27,41 @@ def teardown_request(exception):
 @app.route('/')
 def index():
     return 'Hello, world!'
+
+
+@app.route('/admin/new', methods=['GET'])
+def new_short_url_form():
+    return render_template('new_url.html')
+
+
+@app.route('/admin/new', methods=['POST'])
+def create_short_url():
+
+    url = request.form['url']
+
+    alias = request.form['alias'] or None
+    try:
+        alias = shortener.make_alias(url, alias=alias)
+    except shortener.UncleanAlias:
+        abort(400)
+
+    try:
+        shortener.insert_url(url, alias, g.db)
+    except storage.NotUnique:
+        # Alias not unique? That's okay, we're totally idempotent!
+        pass
+
+    short_url = url_for('short_url', alias=alias, _external=True)
+    return short_url
+
+
+@app.route('/<alias>', methods=['GET'])
+def short_url(alias):
+    try:
+        url = shortener.get_url(alias, g.db)
+    except storage.NotFound:
+        abort(404)
+    return redirect(url, code=301)
 
 
 if __name__ == '__main__':

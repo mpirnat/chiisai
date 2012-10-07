@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+<head>
+<title>Chiisai: Create a New Short URL</title>
+</head>
+<body>
+    <h1>Create a New Short URL</h1>
+    <form action="{{ url_for('create_short_url') }}" method="POST">
+        <p>Long URL: <input type="text" name="url"></p>
+        <p>(Optional) Alias: <input type="text" name="alias"></p>
+        <p><input type="submit" value="Shorten"></p>
+    </form>
+</body>
+</html>
