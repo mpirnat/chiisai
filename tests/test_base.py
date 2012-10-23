@@ -1,6 +1,12 @@
 """Tests for base conversion."""
 
 from chiisai.base import base_encode, base_decode
+from chiisai.base import bytestring_to_integer, integer_to_bytestring
+
+
+def check_case(f, input_, expected):
+    actual = f(input_)
+    assert actual == expected, actual
 
 
 base62_cases = [
@@ -20,17 +26,37 @@ base62_cases = [
 
 def test_converting_base10_to_base62():
 
-    def check_case(base10, base62):
-        assert base_encode(base10) == base62
-
-    for base10, base62 in base62_cases:
-        yield check_case, base10, base62
+    for integer, expected in base62_cases:
+        yield check_case, base_encode, integer, expected
 
 
 def test_converting_base62_to_base10():
 
-    def check_case(base62, base10):
-        assert base_decode(base62) == base10
+    for expected, encoded in base62_cases:
+        yield check_case, base_decode, encoded, expected
 
-    for base10, base62 in base62_cases:
-        yield check_case, base62, base10
+
+bytestring_cases = [
+    ('\x00', 0),
+    ('\x01', 1),
+    ('\xff', 255),
+    ('\x00\x01', 256),
+    ('\x01\x01', 257),
+    ('\xff\x01', 511),
+    ('\x00\x02', 512),
+    ('\xff\x02', 767),
+    ('\x00\x03', 768),
+    ('\xff\xff', 65535),
+    ('\x00\x00\x01', 65536),
+]
+
+def test_converting_bytestrings_to_integers():
+
+    for bytestring, expected in bytestring_cases:
+        yield check_case, bytestring_to_integer, bytestring, expected
+
+
+def test_converting_integers_to_bytestrings():
+
+    for expected, integer in bytestring_cases:
+        yield check_case, integer_to_bytestring, integer, expected
