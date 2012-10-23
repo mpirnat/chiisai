@@ -33,6 +33,7 @@ def base_decode(string_, alphabet=base62):
 
 
 def bytestring_to_integer(bytestring):
+    """Convert a bytestring into its equivalent base10 integer."""
     integer = 0
     for (i, byte) in enumerate(bytestring):
         integer += ord(byte) << (8 * i)
@@ -40,7 +41,7 @@ def bytestring_to_integer(bytestring):
 
 
 def integer_to_bytestring(integer):
-
+    """Convert an integer into its equivalent bytestring."""
     if integer == 0:
         return chr(integer)
 
