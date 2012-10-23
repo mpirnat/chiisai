@@ -2,6 +2,7 @@
 
 import datetime
 from hashlib import md5
+from chiisai import base
 from chiisai import storage
 
 
@@ -37,11 +38,9 @@ def make_hash(value):
 
     # get the hashed value, being careful to strip out characters
     # that are not url-safe
-    hashed = md_5.digest().encode('base64')\
-            .replace('\n','')\
-            .rstrip('=')\
-            .replace('/', '')\
-            .replace('+', '')
+    hashed = base.base_encode(
+            base.bytestring_to_integer(
+                md_5.digest()))
 
     return hashed
 
