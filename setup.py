@@ -6,7 +6,7 @@ README = open(os.path.join(here, 'README.md')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.md')).read()
 
 
-version = '0.0'
+version = '0.1'
 
 install_requires = ['flask==0.9']
 
