@@ -57,8 +57,10 @@ def create_short_url():
     except storage.NotUnique:
         # That alias is already claimed; you can't have it
         if explicit_alias_requested:
-            # TODO: error gracefully
-            abort(403)
+            long_url = shortener.get_url(alias, g.db)
+            if url != long_url:
+                # TODO: error gracefully
+                abort(403)
 
         # Hashed to the same thing?  Be idempotent
         else:
