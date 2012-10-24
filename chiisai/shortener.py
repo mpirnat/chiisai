@@ -67,8 +67,8 @@ def is_clean(value):
 
 
 def insert_url(url, alias, db):
-    sql = "insert into urls(alias, url, created) "\
-            "values(?, ?, ?)"
+    sql = "insert into urls(alias, url, created, hits) "\
+            "values(?, ?, ?, 0)"
     created = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.000")
     storage.query_db(sql, [alias, url, created], db=db)
     db.commit()
@@ -80,3 +80,9 @@ def get_url(alias, db):
     if not result:
         raise storage.NotFound()
     return result['url']
+
+
+def record_hit(alias, db):
+    sql = "update urls set hits = hits + 1 where alias = ?"
+    storage.query_db(sql, [alias], db=db)
+    db.commit()

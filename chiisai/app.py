@@ -92,6 +92,8 @@ def short_url(alias):
     """Look up and redirect to a long URL."""
     try:
         url = shortener.get_url(alias, g.db)
+        if app.config['RECORD_HITS']:
+            shortener.record_hit(alias, g.db)
     except storage.NotFound:
         abort(404)
     return redirect(url, code=301)
