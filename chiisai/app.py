@@ -32,12 +32,29 @@ def index():
 
 @app.route('/admin/new', methods=['GET'])
 def new_short_url_form():
+    """Provide a human-friendly form for shortening URLs."""
     return render_template('new_url.html')
 
 
 @app.route('/admin/new', methods=['POST'])
 def create_short_url():
-    form = forms.URLShortenerForm(request.form)
+    """Provide a POSTable, human-friendly interface for shortening URLs."""
+    short_url = _create_short_url(request.form)
+    return short_url
+
+
+@app.route('/api/new', methods=['GET', 'POST'])
+def create_short_url_api():
+    """
+    Provide an GET/POSTable interface that can be connected to clients that
+    support custom shorteners (eg, Tweetbot).
+    """
+    short_url = _create_short_url(request.form or request.args)
+    return short_url
+
+
+def _create_short_url(form_data):
+    form = forms.URLShortenerForm(form_data)
     if not form.validate():
         # TODO: error gracefully
         abort(400)
@@ -72,6 +89,7 @@ def create_short_url():
 
 @app.route('/<alias>', methods=['GET'])
 def short_url(alias):
+    """Look up and redirect to a long URL."""
     try:
         url = shortener.get_url(alias, g.db)
     except storage.NotFound:
