@@ -92,3 +92,9 @@ def get_top_urls(n, db):
     sql = "select * from urls order by hits desc limit %s" % n
     result = storage.query_db(sql, [], db=db)
     return result
+
+
+def get_recent_urls(n, db):
+    sql = "select * from urls order by created desc limit %s" % n
+    result = storage.query_db(sql, [], db=db)
+    return result

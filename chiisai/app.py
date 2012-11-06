@@ -34,6 +34,7 @@ def index():
 def new_short_url_form():
     """Provide a human-friendly form for shortening URLs."""
     top_urls = shortener.get_top_urls(10, g.db)
+    recent_urls = shortener.get_recent_urls(10, g.db)
     return render_template('new_url.html', **locals())
 
 

@@ -17,5 +17,12 @@
         <li><a href="{{ url_for('short_url', alias=url.alias, _external=True)}}">{{url.alias}}</a>: {{url.url}} - {{url.hits}}</li>
     {% endfor %}
     </ol>
+
+    <h2>Recent URLs</h2>
+    <ol>
+    {% for url in recent_urls %}
+        <li><a href="{{ url_for('short_url', alias=url.alias, _external=True)}}">{{url.alias}}</a>: {{url.url}} - {{url.created}}</li>
+    {% endfor %}
+    </ol>
 </body>
 </html>
