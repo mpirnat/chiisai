@@ -33,7 +33,8 @@ def index():
 @app.route('/admin/new', methods=['GET'])
 def new_short_url_form():
     """Provide a human-friendly form for shortening URLs."""
-    return render_template('new_url.html')
+    top_urls = shortener.get_top_urls(10, g.db)
+    return render_template('new_url.html', **locals())
 
 
 @app.route('/admin/new', methods=['POST'])

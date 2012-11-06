@@ -10,5 +10,12 @@
         <p>(Optional) Alias: <input type="text" name="alias"></p>
         <p><input type="submit" value="Shorten"></p>
     </form>
+
+    <h2>Top URLs</h2>
+    <ol>
+    {% for url in top_urls %}
+        <li><a href="{{ url_for('short_url', alias=url.alias, _external=True)}}">{{url.alias}}</a>: {{url.url}} - {{url.hits}}</li>
+    {% endfor %}
+    </ol>
 </body>
 </html>

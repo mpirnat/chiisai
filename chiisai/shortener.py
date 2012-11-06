@@ -86,3 +86,9 @@ def record_hit(alias, db):
     sql = "update urls set hits = hits + 1 where alias = ?"
     storage.query_db(sql, [alias], db=db)
     db.commit()
+
+
+def get_top_urls(n, db):
+    sql = "select * from urls order by hits desc limit %s" % n
+    result = storage.query_db(sql, [], db=db)
+    return result
